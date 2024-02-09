@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script>
+        var sales = '';
+        function generador() {
+            var nummer = document.getElementById("ea").value;
+            sales = `USE punto_venta;<br>
+            TRUNCATE ventas_detalles;<br>
+            DELETE FROM ventas;<br>
+            INSERT INTO ventas(ID, fecha, hora)VALUES <br>(1,'`
+            + generarFechaAleatoria() + "', '" + generarHoraAleatoria() + "'),";
+
+            for (let index = 2; index <= nummer; index++) {
+                sales += "<br>( "+index+" , '" + generarFechaAleatoria() 
+                + "' , '" + generarHoraAleatoria() + "'),";
+            }
+           
+            if (sales.endsWith(',')) {
+                sales = sales.slice(0, -1) + ';';
+            }
+            sales += `<br>INSERT INTO ventas_detalles(idventas, idproductos) VALUES`;
+
+            for (let i = 1; i <= nummer; i++) {
+                var idventas = Math.floor(Math.random() * 10);
+                for (let j = 0; j < idventas; j++) {
+                    sales += "<br>( "+i+","+Math.floor(1+(Math.random() * 10))+" ),";
+            
+                }
+            }
+            if (sales.endsWith(',')) {
+                sales = sales.slice(0, -1) + ';';
+            }          
+            document.getElementById("ola").innerHTML = sales;
+        }
+
+        function generarFechaAleatoria() {
+            var anio = Math.floor(Math.random() * (2022 - 2000 + 1)) + 2000;
+            var mes = Math.floor(Math.random() * 12) + 1;
+            var dia = Math.floor(Math.random() * 31) + 1;
+            var hora = Math.floor(Math.random() * 24);
+            var minuto = Math.floor(Math.random() * 60);
+            var segundo = Math.floor(Math.random() * 60);
+            var randomDate = new Date(anio, mes - 1, dia, hora, minuto, segundo);
+            var goodDate = randomDate.toISOString().split('T')[0];
+            return goodDate;
+        }
+
+        function generarHoraAleatoria() {
+            var horas = Math.floor(Math.random() * 24);
+            var minutos = Math.floor(Math.random() * 60); 
+            var segundos = Math.floor(Math.random() * 60); 
+            var goodHour = padLeft(horas) + ":" + padLeft(minutos) + ":" + padLeft(segundos);
+            return goodHour;
+        }
+
+        function padLeft(numero) {
+            return numero < 10 ? "0" + numero : numero;
+        }
+
+        function generarSQL(){
+            var archivo = document.createElement('a');
+            var salida = sales.replace(/<br>/g, '\n').trim();
+            archivo.setAttribute('href', 'data:text/plane;charset=utf-8,' 
+            + encodeURIComponent(salida));
+            archivo.setAttribute('download', 'punto_venta.sql');
+            archivo.style.display = 'none';
+            document.body.appendChild(archivo);
+            archivo.click();
+            document.body.removeChild(archivo);
+        }
+    </script>
+
+</head>
+<body>
+    <input type="number" name="numero" id="ea" min = 0 value = 10>
+    <input type="button" value="Generar Ventas" onclick="generador()">
+    <br>
+    <input type="button" value="Generar SQL" onclick="generarSQL()">
+    <p id="ola">
+    </p>
+</body>
+</html>
